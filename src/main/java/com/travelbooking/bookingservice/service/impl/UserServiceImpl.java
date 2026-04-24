@@ -1,11 +1,11 @@
-package com.travelbooking.bookingservice.service.service.impl;
+package com.travelbooking.bookingservice.service.impl;
 
 import org.springframework.stereotype.Service;
 
 import com.travelbooking.bookingservice.dto.UserRegistrationRequest;
 import com.travelbooking.bookingservice.entity.User;
 import com.travelbooking.bookingservice.repository.UserRepository;
-import com.travelbooking.bookingservice.service.service.UserService;
+import com.travelbooking.bookingservice.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {

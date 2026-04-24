@@ -1,4 +1,4 @@
-package com.travelbooking.bookingservice.service.service;
+package com.travelbooking.bookingservice.service;
 
 import com.travelbooking.bookingservice.dto.UserRegistrationRequest;
 
