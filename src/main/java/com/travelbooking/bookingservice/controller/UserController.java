@@ -1,7 +1,7 @@
 package com.travelbooking.bookingservice.controller;
 
+import com.travelbooking.bookingservice.dto.ApiResponse;
 import com.travelbooking.bookingservice.dto.LoginRequest;
-import com.travelbooking.bookingservice.dto.LoginResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,14 +23,14 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(
+    public ResponseEntity<ApiResponse<Object>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
         userService.registerUser(request);
-        return ResponseEntity.ok("User registered successfully.");
+        return ResponseEntity.ok(ApiResponse.builder().message("User registered successfully.").build());
     }
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(
+    public ResponseEntity<ApiResponse<Object>> loginUser(
             @Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(userService.loginUser(request));
+        return ResponseEntity.ok(ApiResponse.builder().message("User registered successfully.").data(userService.loginUser(request)).build());
     }
 }

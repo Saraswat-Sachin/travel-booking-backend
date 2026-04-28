@@ -2,7 +2,7 @@ package com.travelbooking.bookingservice.service.impl;
 
 import com.travelbooking.bookingservice.dto.LoginRequest;
 import com.travelbooking.bookingservice.dto.LoginResponse;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.travelbooking.bookingservice.exception.BadRequestException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     public void registerUser(UserRegistrationRequest request) {
         // 1. Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered.");
+            throw new BadRequestException("Email already registered.");
         }
 
         // 2. Map DTO -> Entity
@@ -49,9 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse loginUser(LoginRequest request){
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new RuntimeException("User not found."));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new BadRequestException("User not found."));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid credentials");
+            throw new BadRequestException("Invalid credentials");
         }
         return LoginResponse.builder()
                 .email(request.getEmail())
