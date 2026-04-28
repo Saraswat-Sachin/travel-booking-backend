@@ -1,5 +1,7 @@
 package com.travelbooking.bookingservice.controller;
 
+import com.travelbooking.bookingservice.dto.LoginRequest;
+import com.travelbooking.bookingservice.dto.LoginResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,5 +27,10 @@ public class UserController {
             @Valid @RequestBody UserRegistrationRequest request) {
         userService.registerUser(request);
         return ResponseEntity.ok("User registered successfully.");
+    }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(
+            @Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(userService.loginUser(request));
     }
 }

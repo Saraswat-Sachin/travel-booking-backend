@@ -1,5 +1,8 @@
 package com.travelbooking.bookingservice.service.impl;
 
+import com.travelbooking.bookingservice.dto.LoginRequest;
+import com.travelbooking.bookingservice.dto.LoginResponse;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +46,16 @@ public class UserServiceImpl implements UserService {
         // 3. Save USER
         userRepository.save(user);
     }
-    
+
+    @Override
+    public LoginResponse loginUser(LoginRequest request){
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new RuntimeException("User not found."));
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new RuntimeException("Invalid credentials");
+        }
+        return LoginResponse.builder()
+                .email(request.getEmail())
+                .message("Login successful")
+                .build();
+    }
 }
