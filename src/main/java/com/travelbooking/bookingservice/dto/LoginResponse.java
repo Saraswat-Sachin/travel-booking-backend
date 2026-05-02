@@ -10,7 +10,7 @@ import lombok.Data;
 public class LoginResponse {
     @Email
     @NotNull
-    private String email;
+    private String token;
     @NotNull
     private String message;
 }

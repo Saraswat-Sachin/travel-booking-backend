@@ -1,5 +1,6 @@
 package com.travelbooking.bookingservice.service.impl;
 
+import com.travelbooking.bookingservice.config.JwtUtil;
 import com.travelbooking.bookingservice.dto.LoginRequest;
 import com.travelbooking.bookingservice.dto.LoginResponse;
 import com.travelbooking.bookingservice.exception.BadRequestException;
@@ -16,10 +17,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -49,12 +52,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse loginUser(LoginRequest request){
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new BadRequestException("User not found."));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new BadRequestException("Invalid credentials"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new BadRequestException("Invalid credentials");
         }
+        String token = jwtUtil.generateToken(request.getEmail());
         return LoginResponse.builder()
-                .email(request.getEmail())
+                .token(token)
                 .message("Login successful")
                 .build();
     }
