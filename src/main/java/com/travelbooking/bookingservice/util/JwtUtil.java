@@ -1,4 +1,4 @@
-package com.travelbooking.bookingservice.config;
+package com.travelbooking.bookingservice.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

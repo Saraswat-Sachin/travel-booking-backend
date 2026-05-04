@@ -3,6 +3,7 @@ package com.travelbooking.bookingservice.service;
 import com.travelbooking.bookingservice.entity.User;
 import com.travelbooking.bookingservice.repository.UserRepository;
 import com.travelbooking.bookingservice.security.CustomUserDetails;
+import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public @NonNull UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException("User not found."));
         return new CustomUserDetails(user);
     }

@@ -8,9 +8,6 @@ import lombok.Data;
 @Data
 @Builder
 public class LoginResponse {
-    @Email
     @NotNull
-    private String token;
-    @NotNull
-    private String message;
+    private String accessToken;
 }

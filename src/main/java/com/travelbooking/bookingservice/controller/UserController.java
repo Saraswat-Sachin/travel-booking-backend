@@ -1,47 +1,75 @@
 package com.travelbooking.bookingservice.controller;
 
 import com.travelbooking.bookingservice.dto.ApiResponse;
-import com.travelbooking.bookingservice.dto.LoginRequest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.web.bind.annotation.*;
-
-import com.travelbooking.bookingservice.dto.UserRegistrationRequest;
+import com.travelbooking.bookingservice.dto.UserResponse;
+import com.travelbooking.bookingservice.dto.UserUpdateRequest;
 import com.travelbooking.bookingservice.service.UserService;
-
-import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@EnableMethodSecurity
 public class UserController {
+
     private final UserService userService;
 
-    UserController(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Object>> registerUser(
-            @Valid @RequestBody UserRegistrationRequest request) {
-        userService.registerUser(request);
-        return ResponseEntity.ok(ApiResponse.builder().message("User registered successfully.").build());
-    }
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Object>> loginUser(
-            @Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(ApiResponse.builder().message("User registered successfully.").data(userService.loginUser(request)).build());
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        UserResponse user = userService.getUserByEmail(email);
+
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .message("User fetched successfully")
+                        .data(user)
+                        .build()
+        );
     }
 
-    // testing purpose - will delete later
-    @GetMapping("/hehe")
-    public ResponseEntity<ApiResponse<Object>> hehe() {
-        return ResponseEntity.ok(ApiResponse.builder().message("User authenticated successfully.").build());
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
+
+        UserResponse user = userService.getUserById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .message("User fetched successfully")
+                        .data(user)
+                        .build()
+        );
     }
-    @GetMapping("/secured-hehe")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Object>> secured_hehe() {
-        return ResponseEntity.ok(ApiResponse.builder().message("Admin authenticated successfully.").build());
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+            @PathVariable Long id,
+            @RequestBody UserUpdateRequest request) {
+
+        UserResponse updatedUser = userService.updateUser(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .message("User updated successfully")
+                        .data(updatedUser)
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable Long id) {
+
+        userService.deleteUser(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .message("User deleted successfully")
+                        .build()
+        );
     }
 }
