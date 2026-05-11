@@ -2,17 +2,21 @@ package com.travelbooking.bookingservice.service.impl;
 
 import com.travelbooking.bookingservice.dto.BookingResponse;
 import com.travelbooking.bookingservice.dto.CreateBookingRequest;
+import com.travelbooking.bookingservice.dto.PageResponse;
 import com.travelbooking.bookingservice.entity.Booking;
 import com.travelbooking.bookingservice.entity.User;
+import com.travelbooking.bookingservice.enums.BookingStatus;
 import com.travelbooking.bookingservice.exception.BadRequestException;
 import com.travelbooking.bookingservice.repository.BookingRepository;
 import com.travelbooking.bookingservice.repository.UserRepository;
 import com.travelbooking.bookingservice.service.BookingService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -32,20 +36,36 @@ public class BookingServiceImpl implements BookingService {
                 .destination(request.getDestination())
                 .travelDate(request.getTravelDate())
                 .numberOfPassengers(request.getNumberOfPassengers())
-                .status("CREATED")
+                .status(BookingStatus.CREATED)
                 .createdAt(LocalDateTime.now())
                 .build();
-        System.out.println("booking");
-        System.out.println(booking.toString());
         return mapToResponse(bookingRepository.save(booking));
     }
 
     @Override
-    public List<BookingResponse> getUserBookings(String email) {
-        return bookingRepository.findByUserEmail(email)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public PageResponse<BookingResponse> getAllBookings(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return PageResponse.from(bookingRepository.findAll(pageable)
+                .map(this::mapToResponse));
+    }
+
+    @Override
+    public PageResponse<BookingResponse> getUserBookingsByEmail(String email, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return PageResponse.from(bookingRepository.findByUserEmail(email, pageable)
+                .map(this::mapToResponse));
+    }
+
+    @Override
+    public PageResponse<BookingResponse> getUserBookingsById(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return PageResponse.from(bookingRepository.findByUserId(userId, pageable)
+                .map(this::mapToResponse));
+    }
+
+    @Override
+    public BookingResponse getBookingById(long id) {
+        return mapToResponse(bookingRepository.findById(id).orElseThrow(()->new BadRequestException("Booking not found")));
     }
 
     @Override
@@ -55,22 +75,14 @@ public class BookingServiceImpl implements BookingService {
         if (!booking.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You cannot cancel this booking");
         }
-        booking.setStatus("CANCELLED");
+        booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
     }
 
     private BookingResponse mapToResponse(Booking booking) {
-        System.out.println("returing");
-        System.out.println(BookingResponse.builder()
-                .id(booking.getId())
-                .source(booking.getSource())
-                .destination(booking.getDestination())
-                .travelDate(booking.getTravelDate())
-                .numberOfPassengers(booking.getNumberOfPassengers())
-                .status(booking.getStatus())
-                .build());
         return BookingResponse.builder()
                 .id(booking.getId())
+                .userId(booking.getUser().getId())
                 .source(booking.getSource())
                 .destination(booking.getDestination())
                 .travelDate(booking.getTravelDate())

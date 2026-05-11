@@ -1,5 +1,6 @@
 package com.travelbooking.bookingservice.entity;
 
+import com.travelbooking.bookingservice.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +30,8 @@ public class Booking {
 
     private int numberOfPassengers;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
     private LocalDateTime createdAt;
 }

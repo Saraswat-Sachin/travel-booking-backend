@@ -1,4 +1,4 @@
-package com.travelbooking.bookingservice.controller;
+package com.travelbooking.bookingservice.controller.auth;
 
 import com.travelbooking.bookingservice.util.JwtUtil;
 import com.travelbooking.bookingservice.dto.ApiResponse;
@@ -11,16 +11,13 @@ import com.travelbooking.bookingservice.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -43,7 +40,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Object>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
         authService.registerUser(request);
-        return ResponseEntity.ok(ApiResponse.builder().message("User registered successfully.").build());
+        return ResponseEntity.ok(new ApiResponse<>("User registered successfully.", null));
     }
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Object>> loginUser(
@@ -63,7 +60,7 @@ public class AuthController {
         LoginResponse final_response = LoginResponse.builder()
                 .accessToken(auth.getAccessToken())
                 .build();
-        return ResponseEntity.ok(ApiResponse.builder().message("User logged in successfully.").data(final_response).build());
+        return ResponseEntity.ok(new ApiResponse<>("User logged in successfully.", final_response));
     }
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<Object>> refreshToken(
@@ -84,7 +81,7 @@ public class AuthController {
         LoginResponse final_response = LoginResponse.builder()
                 .accessToken(newAccessToken)
                 .build();
-        return ResponseEntity.ok(ApiResponse.builder().message("Access token refreshed in successfully.").data(final_response).build());
+        return ResponseEntity.ok(new ApiResponse<>("Access token refreshed in successfully.", final_response));
     }
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Object>> logout(@CookieValue(name = "refreshToken") String refreshToken, HttpServletResponse response) {
@@ -97,6 +94,6 @@ public class AuthController {
                 .sameSite("Strict")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        return ResponseEntity.ok(ApiResponse.builder().message("User logged out successfully.").build());
+        return ResponseEntity.ok(new ApiResponse<>("User logged out successfully.", null));
     }
 }

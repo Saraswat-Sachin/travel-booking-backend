@@ -1,11 +1,4 @@
 package com.travelbooking.bookingservice.dto;
 
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@Builder
-public class ApiResponse<T> {
-    private String message;
-    private T data;
+public record ApiResponse<T>(String message, T data) {
 }

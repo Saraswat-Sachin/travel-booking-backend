@@ -8,7 +8,9 @@ public interface UserService {
 
     UserResponse getUserByEmail(String email);
 
-    UserResponse updateUser(Long id, UserUpdateRequest request);
+    UserResponse updateUserById(Long id, UserUpdateRequest request);
+    UserResponse updateUserByEmail(String email, UserUpdateRequest request);
 
-    void deleteUser(Long id);
+    void deleteUserById(Long id);
+    void deleteUserByEmail(String email);
 }

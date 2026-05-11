@@ -34,11 +34,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse updateUser(Long id, UserUpdateRequest request) {
-
+    public UserResponse updateUserById(Long id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
+        User updated_user = updateUser(user, request);
+        return mapToResponse(updated_user);
+    }
+
+    @Override
+    public UserResponse updateUserByEmail(String email, UserUpdateRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        User updated_user = updateUser(user, request);
+        return mapToResponse(updated_user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        userRepository.delete(user);
+    }
+
+    @Override
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        userRepository.delete(user);
+    }
+    private User updateUser(User user, UserUpdateRequest request) {
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
         }
@@ -58,17 +84,8 @@ public class UserServiceImpl implements UserService {
         if (request.getGender() != null) {
             user.setGender(request.getGender());
         }
-        return mapToResponse(user);
+        return user;
     }
-
-    @Override
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("User not found"));
-        userRepository.delete(user);
-    }
-
     private UserResponse mapToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
